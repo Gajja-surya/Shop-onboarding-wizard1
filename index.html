@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloudnix - Shop Onboarding</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ff6200; /* Orange primary color */
+            --primary-hover: #e55a00; /* Darker orange for hover */
+            --secondary-color: #f8f9fa;
+            --text-color: #495057;
+            --light-text: #6c757d;
+            --border-color: #dee2e6;
+            --white: #ffffff;
+            --card-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            --bg-light: linear-gradient(135deg, #f5f7fa 0%, #f5ece4 100%); /* Adjusted for orange theme */
+            --bg-dark: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+            --text-dark: #e0e0e0;
+            --card-dark: #2d2d2d;
+            --border-dark: #444444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            background: var(--bg-light);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode {
+            color: var(--text-dark);
+            background: var(--bg-dark);
+        }
+
+        body.dark-mode .onboarding-container,
+        body.dark-mode .theme-card,
+        body.dark-mode .form-section {
+            background-color: var(--card-dark);
+            border-color: var(--border-dark);
+        }
+
+        body.dark-mode .theme-info,
+        body.dark-mode .form-section h3,
+        body.dark-mode .step-title h2 {
+            color: var(--text-dark);
+        }
+
+        body.dark-mode .form-control,
+        body.dark-mode .form-select {
+            background-color: #333;
+            color: var(--text-dark);
+            border-color: var(--border-dark);
+        }
+
+        body.dark-mode .image-upload-container {
+            background-color: #2a2a2a;
+            border-color: var(--border-dark);
+        }
+
+        .theme-switch {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .theme-switch i {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary-color);
+        }
+
+        .onboarding-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            background-color: var(--white);
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .onboarding-header {
+            background: linear-gradient(135deg, #ff6200 0%, #e55a00 100%); /* Orange gradient */
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .logo i {
+            margin-right: 10px;
+        }
+
+        .onboarding-header h1 {
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .onboarding-header p {
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .progress-container {
+            max-width: 800px;
+            margin: 30px auto 0;
+        }
+
+        .progress {
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            background-color: white;
+            transition: width 0.5s ease;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .step {
+            text-align: center;
+            position: relative;
+            flex: 1;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        .step.active {
+            color: white;
+            font-weight: 600;
+        }
+
+        .step span {
+            display: block;
+            width: 35px;
+            height: 35px;
+            line-height: 35px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.3);
+            color: white;
+            margin: 0 auto 10px;
+            font-weight: 600;
+        }
+
+        .step.active span {
+            background-color: white;
+            color: var(--primary-color);
+            box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+
+        .step::after {
+            content: '';
+            position: absolute;
+            top: 17px;
+            left: 50%;
+            right: -50%;
+            height: 2px;
+            background-color: rgba(255, 255, 255, 0.3);
+            z-index: 0;
+        }
+
+        .step:last-child::after {
+            display: none;
+        }
+
+        .onboarding-body {
+            padding: 40px 20px;
+        }
+
+        .onboarding-step {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .onboarding-step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .step-title h2 {
+            font-weight: 700;
+            color: #343a40;
+            margin-bottom: 10px;
+        }
+
+        .step-title p {
+            color: var(--light-text);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .theme-selection {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .theme-card {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: white;
+            height: 100%;
+        }
+
+        .theme-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-card.selected {
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 5px 15px rgba(255, 98, 0, 0.2); /* Orange shadow */
+        }
+
+        .theme-preview {
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .theme-card:hover .theme-preview img {
+            transform: scale(1.05);
+        }
+
+        .theme-info {
+            padding: 20px;
+            background-color: var(--white);
+        }
+
+        .theme-info h4 {
+            color: #343a40;
+            margin-bottom: 8px;
+        }
+
+        .theme-info p {
+            color: var(--light-text);
+            font-size: 0.95rem;
+            margin-bottom: 0;
+        }
+
+        .form-section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .form-section h3 {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            color: #343a40;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-section h3 i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+            color: #495057;
+        }
+
+        .form-control, .form-select {
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(255, 98, 0, 0.25); /* Orange focus shadow */
+            outline: none;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-group input {
+            margin-right: 10px;
+        }
+
+        .image-upload-container {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+            background-color: #fafafa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .image-upload-container:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(255, 98, 0, 0.05); /* Orange hover background */
+        }
+
+        .image-upload-container i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .image-upload-container p {
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .image-upload-container small {
+            color: var(--light-text);
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 150px;
+        }
+
+        .btn-prev {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-prev:hover {
+            background-color: #e9ecef;
+        }
+
+        .btn-next, .btn-complete {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+        }
+
+        .btn-next:hover, .btn-complete:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 98, 0, 0.3); /* Orange button shadow */
+        }
+
+        .btn i {
+            margin: 0 5px;
+        }
+
+        @media (max-width: 992px) {
+            .onboarding-container {
+                margin: 1rem auto;
+            }
+            
+            .theme-selection .col-md-4 {
+                margin-bottom: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .onboarding-container {
+                margin: 0.5rem auto;
+            }
+            
+            .onboarding-header {
+                padding: 20px 15px;
+            }
+            
+            .step {
+                font-size: 0.85rem;
+            }
+            
+            .step span {
+                width: 30px;
+                height: 30px;
+                line-height: 30px;
+            }
+            
+            .theme-selection .col-md-4 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+            
+            .navigation-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-hover);
+        }
+
+        body.dark-mode ::-webkit-scrollbar-track {
+            background: #2a2a2a;
+        }
+
+        body.dark-mode ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-switch">
+        <i class="fas fa-moon" id="theme-toggle"></i>
+    </div>
+    <div class="onboarding-container">
+        <div class="onboarding-header">
+            <div class="logo">
+                <i class="fas fa-cloud"></i>Cloudnix
+            </div>
+            <h1>Welcome to Your New Online Shop</h1>
+            <p>Let's get your shop set up in just a few easy steps</p>
+            
+            <div class="progress-container">
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="step-indicator">
+                    <div class="step active"><span>1</span> Theme</div>
+                    <div class="step"><span>2</span> Basic Details</div>
+                    <div class="step"><span>3</span> Pricing Details</div>
+                    <div class="step"><span>4</span> Complete</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="onboarding-body">
+            <!-- Step 1: Theme Selection -->
+            <div class="onboarding-step active" id="step1">
+                <div class="step-title">
+                    <h2>Choose Your Shop Theme</h2>
+                    <p>Select a design that matches your brand personality</p>
+                </div>
+                
+                <div class="row theme-selection">
+                    <div class="col-md-4 mb-4">
+                        <div class="theme-card selected">
+                            <div class="theme-preview">
+                                <img src="https://images.unsplash.com/photo-1558655146-d09347e92766?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&h=400&q=80" alt="Orange Theme">
+                            </div>
+                            <div class="theme-info">
+                                <h4>Orange Elegance</h4>
+                                <p>Clean, professional look with orange accents</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-4">
+                        <div class="theme-card">
+                            <div class="theme-preview">
+                                <img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&h=400&q=80" alt="Warm Theme">
+                            </div>
+                            <div class="theme-info">
+                                <h4>Warm Energy</h4>
+                                <p>Vibrant and energetic warm theme</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-4">
+                        <div class="theme-card">
+                            <div class="theme-preview">
+                                <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&h=400&q=80" alt="Red Theme">
+                            </div>
+                            <div class="theme-info">
+                                <h4>Red Trust</h4>
+                                <p>Trustworthy and bold red design</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="navigation-buttons">
+                    <button class="btn btn-next" onclick="nextStep()">Next: Basic Details <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+            
+            <!-- Step 2: Basic Product Details -->
+            <div class="onboarding-step" id="step2">
+                <div class="step-title">
+                    <h2>Add Your First Product - Basic Details</h2>
+                    <p>Enter the basic information for your first product</p>
+                </div>
+                
+                <div class="form-section">
+                    <h3><i class="fas fa-info-circle"></i> Basic Details</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Product name</label>
+                        <input type="text" class="form-control" placeholder="eg - Anatomy book">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Product Description</label>
+                        <textarea class="form-control" rows="4" placeholder="Enter detailed description of your product"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Add Image(s)</label>
+                        <div class="image-upload-container">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Drag & drop images here or <b>browse</b></p>
+                            <small>Recommended size: 800x800 pixels</small>
+                        </div>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="hasSku">
+                        <label for="hasSku">This product has an SKU code</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="eg - PROD0001">
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="hasHsn">
+                        <label for="hasHsn">This product has an HSN/SAC code</label>
+                    </div>
+                </div>
+                
+                <div class="navigation-buttons">
+                    <button class="btn btn-prev" onclick="prevStep()"><i class="fas fa-arrow-left"></i> Previous</button>
+                    <button class="btn btn-next" onclick="nextStep()">Next: Pricing Details <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+            
+            <!-- Step 3: Pricing Details -->
+            <div class="onboarding-step" id="step3">
+                <div class="step-title">
+                    <h2>Add Your First Product - Pricing Details</h2>
+                    <p>Enter the pricing information for your first product</p>
+                </div>
+                
+                <div class="form-section">
+                    <h3><i class="fas fa-tag"></i> Pricing Details</h3>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="gstInclusive">
+                        <label for="gstInclusive">Price inclusive of GST</label>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Net price</label>
+                                <input type="number" class="form-control" placeholder="eg - 80">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Discount percentage</label>
+                                <input type="number" class="form-control" placeholder="eg - 40">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Shipping charges (if any)</label>
+                                <input type="number" class="form-control" placeholder="eg - 40">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">List price</label>
+                                <input type="number" class="form-control" placeholder="eg - 100">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">GST rate</label>
+                                <input type="number" class="form-control" placeholder="eg - 20">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Stock level</label>
+                                <input type="number" class="form-control" placeholder="eg - 110">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="navigation-buttons">
+                    <button class="btn btn-prev" onclick="prevStep()"><i class="fas fa-arrow-left"></i> Previous</button>
+                    <button class="btn btn-next" onclick="nextStep()">Next: Complete <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+            
+            <!-- Step 4: Complete -->
+            <div class="onboarding-step" id="step4">
+                <div class="step-title">
+                    <h2>Setup Complete!</h2>
+                    <p>Your shop is ready to go live. Review your settings and launch your store!</p>
+                </div>
+                
+                <div class="form-section">
+                    <h3><i class="fas fa-check-circle"></i> Final Review</h3>
+                    <p>Everything is set! Click the button below to launch your online shop.</p>
+                </div>
+                
+                <div class="navigation-buttons">
+                    <button class="btn btn-prev" onclick="prevStep()"><i class="fas fa-arrow-left"></i> Previous</button>
+                    <button class="btn btn-complete">Launch Shop</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initialize the first step
+            showStep(1);
+            
+            // Theme selection functionality
+            $('.theme-card').click(function() {
+                $('.theme-card').removeClass('selected');
+                $(this).addClass('selected');
+            });
+
+            // Theme toggle functionality
+            $('#theme-toggle').click(function() {
+                $('body').toggleClass('dark-mode');
+                $(this).toggleClass('fa-moon fa-sun');
+                localStorage.setItem('theme', $('body').hasClass('dark-mode') ? 'dark' : 'light');
+            });
+
+            // Load saved theme preference
+            if (localStorage.getItem('theme') === 'dark') {
+                $('body').addClass('dark-mode');
+                $('#theme-toggle').removeClass('fa-moon').addClass('fa-sun');
+            }
+        });
+
+        function showStep(stepNumber) {
+            // Hide all steps
+            $('.onboarding-step').removeClass('active');
+            
+            // Show the selected step
+            $('#step' + stepNumber).addClass('active');
+            
+            // Update progress bar
+            var progressWidth = (stepNumber / 4) * 100;
+            $('.progress-bar').css('width', progressWidth + '%');
+            
+            // Update step indicators
+            $('.step').removeClass('active');
+            for (var i = 1; i <= stepNumber; i++) {
+                $('.step:nth-child(' + i + ')').addClass('active');
+            }
+        }
+
+        function nextStep() {
+            var currentStep = $('.onboarding-step.active').attr('id').replace('step', '');
+            var nextStep = parseInt(currentStep) + 1;
+            
+            if (nextStep <= 4) {
+                showStep(nextStep);
+                // Scroll to top of the step
+                $('html, body').animate({
+                    scrollTop: $('.onboarding-container').offset().top
+                }, 300);
+            }
+        }
+
+        function prevStep() {
+            var currentStep = $('.onboarding-step.active').attr('id').replace('step', '');
+            var prevStep = parseInt(currentStep) - 1;
+            
+            if (prevStep >= 1) {
+                showStep(prevStep);
+                // Scroll to top of the step
+                $('html, body').animate({
+                    scrollTop: $('.onboarding-container').offset().top
+                }, 300);
+            }
+        }
+    </script>
+</body>
+</html>
